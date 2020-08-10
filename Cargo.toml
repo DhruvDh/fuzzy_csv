@@ -1,0 +1,32 @@
+[package]
+name = "fuzzy_csv"
+version = "0.1.0"
+authors = ["Dhruv Dhamani <dhruv.dhamani@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+console_error_panic_hook = "0.1.6"
+yew = "0.17.2"
+wasm-bindgen-futures = "0.4.17"
+csv = "1.1"
+serde = "*"
+serde_derive = "*"
+fuzzy-matcher = "0.3.5"
+
+[dependencies.web-sys]
+version = "0.3.44"
+features = ["Document", "Element", "File", "FileList", "FileReader", "console"]
+
+[dependencies.wasm-bindgen]
+version = "0.2.67"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-O3']
+
+[profile.release]
+lto = true
