@@ -85,7 +85,7 @@ enum Msg {
 impl Model {
     fn file_parsed(&self) -> Html {
         if self.file_parsed {
-            html! { <pre> { format!("      ✅ found {} records", self.records.len()) } </pre> }
+            html! { <pre> { format!("      ✅ found {} records", self.records.len() - 1) } </pre> }
         } else {
             html! {}
         }
