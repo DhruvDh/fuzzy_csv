@@ -85,7 +85,7 @@ enum Msg {
 impl Model {
     fn file_parsed(&self) -> Html {
         if self.file_parsed {
-            html! { <pre> { format!("      ✅ found {} records", self.records.len() - 1) } </pre> }
+            html! { <pre> { format!("      ✅ found {} records", self.records.len()) } </pre> }
         } else {
             html! {}
         }
@@ -93,7 +93,7 @@ impl Model {
 
     fn render_records(&self) -> Html {
         html! {
-            <pre> { 
+            <pre> {
                 self.sorted_records
                     .iter()
                     .rev()
@@ -126,7 +126,11 @@ impl Component for Model {
                 let matcher = SkimMatcherV2::default();
 
                 for (i, r) in self.clean_records.iter().enumerate() {
-                    let score = matcher.fuzzy_match(r, &val).unwrap_or(0);
+                    let score = match matcher.fuzzy_match(r, &val) {
+                        Some(result) => result,
+                        None => std::i64::MIN,
+                    };
+
                     self.records[i as usize].score = score;
                 }
 
@@ -157,7 +161,7 @@ impl Component for Model {
             }
             Msg::FileRead(data) => {
                 let text = String::from_utf8(data.content).unwrap();
-                
+
                 let text = text.replace("MS in Computer Science", "Masters in Computer Science");
                 let text = text.replace("BS in Computer Science", "Bachelors in Computer Science");
 
@@ -167,8 +171,6 @@ impl Component for Model {
                 for record in rdr.deserialize::<Record>() {
                     match record {
                         Ok(r) => {
-                            index = index + 1;
-
                             let qualified_for = r.qualified_for;
                             let qualified_for = qualified_for
                                 .split_whitespace()
@@ -177,7 +179,6 @@ impl Component for Model {
                                 .split(",")
                                 .collect::<Vec<&str>>()
                                 .join("\n");
-                            
 
                             let r = Record {
                                 _index: index,
@@ -273,13 +274,12 @@ impl Component for Model {
                             self.records.push(r);
 
                             self.file_parsed = true;
+                            index = index + 1;
                         }
                         Err(e) => ConsoleService::log(format!("{:?}", e).as_str()),
                     }
                 }
-                
-                self.clean_records.push(String::new());
-                self.records.push(Record::default());
+
                 self.sorted_records = self.records.iter().map(|r| r._index).collect();
             }
         }
