@@ -270,6 +270,12 @@ impl Component for Model {
                                 );
                             }
 
+                            if r.resume != "" {
+                                clean.push_str(
+                                    format!("• Resume:        {}\n", r.resume.trim()).as_str(),
+                                );
+                            }
+
                             self.clean_records.push(clean);
                             self.records.push(r);
 
